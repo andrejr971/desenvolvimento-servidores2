@@ -1,23 +1,28 @@
 <?php
   ini_set('display_errors', 1);
 
-  require_once 'classes/Database.php';
+  require_once 'database/Database.php';
   require_once 'classes/Schema.php';
   // require_once 'controller/ListPeoplesController.php';
 
   $conection = Database::getConnection();
 
-  $dataInsert = ['NOME' => 'vinicius', 'EMAIL' => 'v@gmail.com', 'TIPO' => 'JURIDICO'];
+  $data = ['EMAIL' => 'atualizado@gmail.com', 'TIPO' => 'FISICA'];
 
-  $dataDelete = ['ID' => 37];
+  $codition =  ['ID' => 2];
 
   Schema::setConnection($conection);
   Schema::setTable('tb_pessoa');
 
-  $peolpe = Schema::insert($dataInsert) . '<br><br>';
+  // $peolpe = Schema::update($data, $codition) . '<br><br>';
 
-  if ($peolpe) {
-    echo 'SUCESSO';
-  } else {
-      echo 'ERRO';
-  }
+  $sql = 'SELECT * FROM tb_pessoa';
+  $peoples = Schema::select($sql, [], true);
+
+  print_r($peoples);
+
+  // if ($peolpe) {
+  //   echo 'SUCESSO';
+  // } else {
+  //     echo 'ERRO';
+  // }

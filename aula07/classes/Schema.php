@@ -23,10 +23,30 @@ class Schema {
     return $lineSql;
   }
 
+  private static function sqlUpdate(Array $data,  Array $conditions): string {
+    $lineSql = 'UPDATE ' . self::$table . ' SET ';
+
+    foreach ($data as $key => $value) {
+      $lineSql .= " {$key} = :{$key}, "; 
+    }
+
+    $lineSql = rtrim($lineSql, ', ');
+
+    $lineSql .= ' WHERE ';
+
+    foreach ($conditions as $key => $value) {
+      $lineSql .= " {$key} = :{$key} AND";
+    }
+
+    $lineSql =  rtrim($lineSql, 'AND');
+
+    return $lineSql;
+  }
+
   private static function sqlDelete(Array $dataDelete): string {
     $lineSql = 'DELETE FROM ' . self::$table . ' WHERE ';
 
-    foreach ($$dataDelete as $key => $value) {
+    foreach ($dataDelete as $key => $value) {
       $lineSql .= " {$key} = :{$key} AND";
     }
 
@@ -34,7 +54,6 @@ class Schema {
 
     return $lineSql;
   }
-
 
   public static function insert(Array $dataInsert): bool {
     $lineInsert = self::sqlInsert($dataInsert);
@@ -61,6 +80,40 @@ class Schema {
       $return = $stmt->execute();
 
       return $return;
+  }
+
+  public static function update($data, $conditions): bool {
+    $lineUpdate = self::sqlUpdate($data, $conditions);
+    $stmt = self::$connection->prepare($lineUpdate);
+
+    foreach ($data as $key => $value) {
+      $stmt->bindValue(':' . $key, $value);
+    }
+
+    foreach ($conditions as $key => $value) {
+      $stmt->bindValue(':' . $key, $value);
+    }
+
+    
+    $return = $stmt->execute();
+
+    return $return;
+  }
+
+  public static function select($sql, $conditions, $fetchAll) {
+    $stmt = self::$connection->prepare($sql);
+
+    foreach($conditions as $key => $value) {
+      $stmt->bindValue(':' . $key, $value);
+    }
+
+    $stmt->execute();
+
+    if ($fetchAll) {
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
+    } else {
+      return $stmt->fetch(PDO::FETCH_OBJ);
+    }
   }
 }
 
