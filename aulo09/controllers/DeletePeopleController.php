@@ -7,7 +7,7 @@
     }
 
     public function handle() {
-      $id = basename($_SERVER['REQUEST_URI']);
+      $id = Request::params();
 
       $people = $this->peopleRepository->findById($id);
 
